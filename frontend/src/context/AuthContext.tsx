@@ -1,7 +1,9 @@
+
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'customer';
 
@@ -86,11 +88,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       const { token, user } = response.data;
+      
+      // Determine role based on email domain
+      const role = email.endsWith('@sssteelindia.com') ? 'admin' : 'customer';
+      
+      // Update user with role information
+      const updatedUser = { ...user, role };
+      
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
 
-      toast.success(`Welcome back, ${user.name}!`);
+      toast.success(`Welcome back, ${updatedUser.name}!`);
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -115,17 +124,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
+      
+      // Determine role based on email domain
+      const role = email.endsWith('@sssteelindia.com') ? 'admin' : 'customer';
+      
       const response = await axios.post(`${API_BASE_URL}/auth/register`, {
         name,
         email,
         password,
         mobile,
+        role, // Include role in registration
       });
 
       const { token, user } = response.data;
+      
+      // Ensure the user object includes role
+      const updatedUser = { ...user, role };
+      
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
 
       toast.success('Registration successful! Welcome!');
       return true;

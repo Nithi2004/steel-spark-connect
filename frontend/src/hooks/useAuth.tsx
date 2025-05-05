@@ -1,15 +1,8 @@
+
 import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  isAdmin: boolean;
-  // Add other user properties as needed
-};
+import { toast } from 'sonner';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -19,48 +12,7 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await axios.post<{
-        token: string;
-        user: User;
-      }>('http://localhost:5000/api/auth/login', { email, password });
-
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      context.setUser(user);
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
-  };
-
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await axios.post<{
-        token: string;
-        user: User;
-      }>('http://localhost:5000/api/auth/register', { name, email, password });
-
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      context.setUser(user);
-      return true;
-    } catch (error) {
-      console.error('Registration error:', error);
-      return false;
-    }
-  };
-
-  const logout = (): void => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    context.setUser(null);
-    navigate('/login');
-  };
+  const { user, isAdmin, login, register, logout } = context;
 
   const loginAndRedirect = async (
     email: string,
@@ -69,9 +21,12 @@ export const useAuth = () => {
   ): Promise<boolean> => {
     const success = await login(email, password);
     if (success) {
-      const destination = context.user?.isAdmin 
+      // Redirect based on user role
+      const isAdminUser = email.endsWith('@sssteelindia.com');
+      const destination = isAdminUser 
         ? '/admin/dashboard' 
-        : redirectPath || '/';
+        : redirectPath || '/customer/dashboard';
+      
       navigate(destination);
       return true;
     }
@@ -81,19 +36,23 @@ export const useAuth = () => {
   const registerAndRedirect = async (
     name: string,
     email: string,
-    password: string
+    password: string,
+    mobile?: string
   ): Promise<boolean> => {
-    const success = await register(name, email, password);
+    const success = await register(name, email, password, mobile);
     if (success) {
-      navigate('/');
+      toast.success('Account created successfully!');
+      // Redirect based on user role from email domain
+      const isAdminUser = email.endsWith('@sssteelindia.com');
+      navigate(isAdminUser ? '/admin/dashboard' : '/customer/dashboard');
       return true;
     }
     return false;
   };
 
   return {
-    user: context.user,
-    isAdmin: context.user?.isAdmin || false,
+    user,
+    isAdmin,
     login,
     logout,
     register,

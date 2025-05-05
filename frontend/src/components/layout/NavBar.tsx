@@ -51,7 +51,7 @@ const NavBar = () => {
                 to={link.path}
                 className={`${
                   isActive(link.path) ? 'nav-link-active' : 'nav-link-default'
-                } nav-link`}
+                } nav-link transition-all duration-300 ease-in-out`}
               >
                 {link.name}
               </Link>
@@ -63,7 +63,7 @@ const NavBar = () => {
                 to={dashboardLink}
                 className={`${
                   isActive(dashboardLink) ? 'nav-link-active' : 'nav-link-default'
-                } nav-link flex items-center space-x-1`}
+                } nav-link flex items-center space-x-1 transition-all duration-300 ease-in-out`}
               >
                 <LayoutDashboard className="h-4 w-4 mr-1" />
                 <span>Dashboard</span>
@@ -78,11 +78,11 @@ const NavBar = () => {
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     {!isAdmin && (
-                      <Link to="/cart" className="text-white hover:text-steelgray-200 mr-3">
+                      <Link to="/cart" className="text-white hover:text-steelgray-200 transition-all duration-300 mr-3">
                         <ShoppingCart className="h-5 w-5" />
                       </Link>
                     )}
-                    <NavigationMenuTrigger className="bg-transparent text-white hover:bg-steelblue-800 hover:text-white transition-colors duration-200">
+                    <NavigationMenuTrigger className="bg-transparent text-white hover:bg-steelblue-800 hover:text-white transition-all duration-300">
                       <div className="flex items-center">
                         <User className="h-4 w-4 mr-2" />
                         <span>{user.name}</span>
@@ -94,7 +94,7 @@ const NavBar = () => {
                           <NavigationMenuLink asChild>
                             <Link
                               to={dashboardLink}
-                              className="block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-colors duration-200"
+                              className="block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-all duration-300"
                             >
                               Dashboard
                             </Link>
@@ -103,7 +103,7 @@ const NavBar = () => {
                         <li>
                           <button
                             onClick={logout}
-                            className="w-full text-left block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-colors duration-200"
+                            className="w-full text-left block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-all duration-300"
                           >
                             Logout
                           </button>
@@ -118,13 +118,13 @@ const NavBar = () => {
                 <Link to="/login">
                   <Button 
                     variant="ghost" 
-                    className="text-white hover:bg-steelblue-800 hover:text-white transition-colors duration-300"
+                    className="text-white hover:bg-steelblue-800 hover:text-white transition-all duration-300"
                   >
                     Login
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="bg-steelred-500 hover:bg-steelred-600 transition-colors duration-300">Register</Button>
+                  <Button className="bg-steelred-500 hover:bg-steelred-600 transition-all duration-300">Register</Button>
                 </Link>
               </div>
             )}
@@ -134,7 +134,7 @@ const NavBar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="text-white hover:text-steelgray-200 focus:outline-none"
+              className="text-white hover:text-steelgray-200 focus:outline-none transition-all duration-300"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -154,7 +154,7 @@ const NavBar = () => {
                   isActive(link.path)
                     ? 'bg-steelblue-700 text-white'
                     : 'text-steelgray-100 hover:bg-steelblue-600 hover:text-white'
-                } block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200`}
+                } block px-3 py-2 rounded-md text-base font-medium transition-all duration-300`}
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}
@@ -169,7 +169,7 @@ const NavBar = () => {
                 </div>
                 <Link
                   to={dashboardLink}
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-colors duration-200"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-300"
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -178,7 +178,7 @@ const NavBar = () => {
                 {!isAdmin && (
                   <Link
                     to="/cart"
-                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-colors duration-200"
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-300"
                     onClick={() => setIsOpen(false)}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
@@ -190,7 +190,7 @@ const NavBar = () => {
                     logout();
                     setIsOpen(false);
                   }}
-                  className="w-full text-left flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-colors duration-200"
+                  className="w-full text-left flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-300"
                 >
                   Logout
                 </button>
@@ -199,14 +199,14 @@ const NavBar = () => {
               <div className="flex flex-col space-y-1 px-3 py-2">
                 <Link
                   to="/login"
-                  className="text-steelgray-100 hover:bg-steelblue-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  className="text-steelgray-100 hover:bg-steelblue-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-all duration-300"
                   onClick={() => setIsOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-steelred-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-steelred-600 transition-colors duration-200"
+                  className="bg-steelred-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-steelred-600 transition-all duration-300"
                   onClick={() => setIsOpen(false)}
                 >
                   Register
