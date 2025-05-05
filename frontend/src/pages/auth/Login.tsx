@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,8 +15,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -26,7 +27,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loginAndRedirect } = useAuth();
+  const { loginAndRedirect, loginWithSupabase } = useAuth();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -39,18 +40,28 @@ const Login = () => {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      await loginAndRedirect(data.email, data.password);
-    } catch (error: any) {
-      if (error.response) {
-        console.error('Error response:', error.response);
-        alert(error.response?.data?.message || 'Login failed');
-      } else if (error.request) {
-        console.error('Error request:', error.request);
-        alert('No response from the server. Please try again later.');
-      } else {
-        console.error('Error message:', error.message);
-        alert('An error occurred while logging in.');
+      // Try primary login method first
+      const success = await loginAndRedirect(data.email, data.password);
+      
+      if (!success) {
+        // If primary method fails, try direct Supabase login as fallback
+        console.log('Trying direct Supabase login as fallback');
+        
+        try {
+          await loginWithSupabase(data.email, data.password);
+          toast.success('Login successful!');
+          
+          // Redirect based on email domain
+          const isAdmin = data.email.endsWith('@sssteelindia.com');
+          window.location.href = isAdmin ? '/admin/dashboard' : '/customer/dashboard';
+        } catch (supabaseError) {
+          console.error('Direct Supabase login failed:', supabaseError);
+          toast.error('Login failed. Please check your credentials.');
+        }
       }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast.error(error?.message || 'Login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

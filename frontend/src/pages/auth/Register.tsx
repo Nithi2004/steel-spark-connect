@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
@@ -15,7 +16,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
-import axios from 'axios';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z
   .object({
@@ -50,22 +52,42 @@ const Register = () => {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        mobile: data.mobile,
-      });
-
-      // Optionally show success message or toast
-      console.log('Registration successful:', response.data);
-
-      // Redirect or handle login
-      await registerAndRedirect(data.name, data.email, data.password);
+      // Try using the context registration method
+      const success = await registerAndRedirect(data.name, data.email, data.password, data.mobile);
+      
+      if (!success) {
+        // Fallback to direct Supabase registration if context method fails
+        console.log('Trying direct Supabase registration as fallback');
+        
+        try {
+          // Register with Supabase
+          const { data: authData, error } = await supabase.auth.signUp({
+            email: data.email,
+            password: data.password,
+            options: {
+              data: {
+                name: data.name,
+                mobile: data.mobile,
+                role: data.email.endsWith('@sssteelindia.com') ? 'admin' : 'customer'
+              }
+            }
+          });
+          
+          if (error) throw error;
+          
+          toast.success('Account created successfully!');
+          
+          // Redirect based on email domain
+          const isAdmin = data.email.endsWith('@sssteelindia.com');
+          window.location.href = isAdmin ? '/admin/dashboard' : '/customer/dashboard';
+        } catch (supabaseError: any) {
+          console.error('Direct Supabase registration failed:', supabaseError);
+          toast.error(supabaseError.message || 'Registration failed. Please try again.');
+        }
+      }
     } catch (error: any) {
-      // Optionally show error toast
-      console.error('Registration error:', error.response?.data || error.message);
-      alert(error.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', error);
+      toast.error(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
