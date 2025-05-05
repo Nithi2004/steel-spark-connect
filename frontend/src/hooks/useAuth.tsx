@@ -21,12 +21,13 @@ export const useAuth = () => {
   ): Promise<boolean> => {
     const success = await login(email, password);
     if (success) {
-      // Redirect based on user role
+      // Determine if user is admin based on email domain
       const isAdminUser = email.endsWith('@sssteelindia.com');
       const destination = isAdminUser 
         ? '/admin/dashboard' 
         : redirectPath || '/customer/dashboard';
       
+      toast.success(`Welcome back${user?.name ? ', ' + user.name : ''}!`);
       navigate(destination);
       return true;
     }
@@ -42,7 +43,7 @@ export const useAuth = () => {
     const success = await register(name, email, password, mobile);
     if (success) {
       toast.success('Account created successfully!');
-      // Redirect based on user role from email domain
+      // Determine if user is admin based on email domain
       const isAdminUser = email.endsWith('@sssteelindia.com');
       navigate(isAdminUser ? '/admin/dashboard' : '/customer/dashboard');
       return true;

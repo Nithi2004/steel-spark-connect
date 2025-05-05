@@ -29,10 +29,16 @@ const NavBar = () => {
     { name: 'Contact Us', path: '/contact' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  // Add dashboard link if user is logged in
+  if (user) {
+    const dashboardLink = isAdmin 
+      ? { name: 'Dashboard', path: '/admin/dashboard' } 
+      : { name: 'Dashboard', path: '/customer/dashboard' };
+    
+    navLinks.push(dashboardLink);
+  }
 
-  // Dashboard link based on user role
-  const dashboardLink = isAdmin ? '/admin/dashboard' : '/customer/dashboard';
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="bg-steelblue-900 shadow-lg sticky top-0 z-50">
@@ -50,25 +56,12 @@ const NavBar = () => {
                 key={link.name}
                 to={link.path}
                 className={`${
-                  isActive(link.path) ? 'nav-link-active' : 'nav-link-default'
-                } nav-link transition-all duration-300 ease-in-out`}
+                  isActive(link.path) ? 'text-white border-b-2 border-white' : 'text-steelgray-100'
+                } px-3 py-2 font-medium hover:text-white transition-all duration-200 ease-in-out`}
               >
                 {link.name}
               </Link>
             ))}
-
-            {/* Dashboard Link for logged in users */}
-            {user && (
-              <Link
-                to={dashboardLink}
-                className={`${
-                  isActive(dashboardLink) ? 'nav-link-active' : 'nav-link-default'
-                } nav-link flex items-center space-x-1 transition-all duration-300 ease-in-out`}
-              >
-                <LayoutDashboard className="h-4 w-4 mr-1" />
-                <span>Dashboard</span>
-              </Link>
-            )}
           </div>
 
           {/* Desktop Auth Buttons */}
@@ -78,11 +71,11 @@ const NavBar = () => {
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     {!isAdmin && (
-                      <Link to="/cart" className="text-white hover:text-steelgray-200 transition-all duration-300 mr-3">
+                      <Link to="/cart" className="text-white hover:text-steelgray-200 transition-all duration-200 mr-3">
                         <ShoppingCart className="h-5 w-5" />
                       </Link>
                     )}
-                    <NavigationMenuTrigger className="bg-transparent text-white hover:bg-steelblue-800 hover:text-white transition-all duration-300">
+                    <NavigationMenuTrigger className="bg-transparent hover:bg-opacity-20 text-white hover:bg-steelblue-800 hover:text-white transition-all duration-200 rounded-md">
                       <div className="flex items-center">
                         <User className="h-4 w-4 mr-2" />
                         <span>{user.name}</span>
@@ -93,8 +86,8 @@ const NavBar = () => {
                         <li>
                           <NavigationMenuLink asChild>
                             <Link
-                              to={dashboardLink}
-                              className="block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-all duration-300"
+                              to={isAdmin ? "/admin/dashboard" : "/customer/dashboard"}
+                              className="block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-all duration-200"
                             >
                               Dashboard
                             </Link>
@@ -103,7 +96,7 @@ const NavBar = () => {
                         <li>
                           <button
                             onClick={logout}
-                            className="w-full text-left block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-all duration-300"
+                            className="w-full text-left block px-4 py-2 text-sm text-steelgray-700 hover:bg-steelgray-100 hover:text-steelblue-700 rounded-md transition-all duration-200"
                           >
                             Logout
                           </button>
@@ -118,13 +111,17 @@ const NavBar = () => {
                 <Link to="/login">
                   <Button 
                     variant="ghost" 
-                    className="text-white hover:bg-steelblue-800 hover:text-white transition-all duration-300"
+                    className="text-white hover:bg-white hover:bg-opacity-20 hover:text-white transition-all duration-200"
                   >
                     Login
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="bg-steelred-500 hover:bg-steelred-600 transition-all duration-300">Register</Button>
+                  <Button 
+                    className="bg-steelred-500 hover:bg-steelred-600 transition-all duration-200"
+                  >
+                    Register
+                  </Button>
                 </Link>
               </div>
             )}
@@ -134,7 +131,7 @@ const NavBar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="text-white hover:text-steelgray-200 focus:outline-none transition-all duration-300"
+              className="text-white hover:text-steelgray-200 focus:outline-none transition-all duration-200"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -154,31 +151,23 @@ const NavBar = () => {
                   isActive(link.path)
                     ? 'bg-steelblue-700 text-white'
                     : 'text-steelgray-100 hover:bg-steelblue-600 hover:text-white'
-                } block px-3 py-2 rounded-md text-base font-medium transition-all duration-300`}
+                } block px-3 py-2 rounded-md text-base font-medium transition-all duration-200`}
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
 
-            {user && (
+            {user ? (
               <>
                 <div className="flex items-center px-3 py-2 text-steelgray-100">
                   <User className="h-4 w-4 mr-2" />
                   <span>{user.name}</span>
                 </div>
-                <Link
-                  to={dashboardLink}
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-300"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <LayoutDashboard className="h-4 w-4 mr-2" />
-                  <span>Dashboard</span>
-                </Link>
                 {!isAdmin && (
                   <Link
                     to="/cart"
-                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-300"
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-200"
                     onClick={() => setIsOpen(false)}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
@@ -190,7 +179,7 @@ const NavBar = () => {
                     logout();
                     setIsOpen(false);
                   }}
-                  className="w-full text-left flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-300"
+                  className="w-full text-left flex items-center px-3 py-2 rounded-md text-base font-medium text-steelgray-100 hover:bg-steelblue-600 hover:text-white transition-all duration-200"
                 >
                   Logout
                 </button>
@@ -199,14 +188,14 @@ const NavBar = () => {
               <div className="flex flex-col space-y-1 px-3 py-2">
                 <Link
                   to="/login"
-                  className="text-steelgray-100 hover:bg-steelblue-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-all duration-300"
+                  className="text-steelgray-100 hover:bg-steelblue-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
                   onClick={() => setIsOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-steelred-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-steelred-600 transition-all duration-300"
+                  className="bg-steelred-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-steelred-600 transition-all duration-200"
                   onClick={() => setIsOpen(false)}
                 >
                   Register
@@ -216,6 +205,23 @@ const NavBar = () => {
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        .nav-link-active {
+          color: white;
+          border-bottom: 2px solid white;
+        }
+        .nav-link-default {
+          color: #e5e7eb; /* text-steelgray-100 */
+        }
+        .nav-link {
+          padding: 0.5rem 0.75rem;
+          font-weight: 500;
+        }
+        .nav-link:hover {
+          color: white;
+        }
+      `}</style>
     </nav>
   );
 };
